@@ -38,7 +38,7 @@ void sig_handler(int signo){
 }
 
 int main(int argc, char* argv[]){
-    if(argc != 3 && argc != 5){
+    if(argc != 3 && argc != 4 && argc != 5){
         usage();
         return 0;
     }
