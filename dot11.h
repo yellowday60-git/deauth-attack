@@ -3,6 +3,7 @@
 #include "mac.h"
 
 #define SUBTYPE_DEAUTH 0xc;
+#define SUBTYPE_AUTH 0xb;
 
 struct Dot11
 {
