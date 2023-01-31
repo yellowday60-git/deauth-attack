@@ -3,6 +3,7 @@
 #include "mac.h"
 
 #include <iostream>
+#incluce <unistd.h>
 #include <cstdio>
 #include <pcap.h>
 #include <signal.h>
@@ -44,6 +45,9 @@ int main(int argc, char* argv[]){
 
     Mac ap = Mac(argv[2]);
     Mac station;
+    if(argc == 4){
+        station = Mac(argv[3]);
+    }
     if(argc == 5){
         station = Mac(argv[3]);
         AUTH = 1;
