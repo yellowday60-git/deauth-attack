@@ -3,7 +3,7 @@
 #include "mac.h"
 
 #include <iostream>
-#incluce <unistd.h>
+#include <unistd.h>
 #include <cstdio>
 #include <pcap.h>
 #include <signal.h>
